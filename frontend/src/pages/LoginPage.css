@@ -1,0 +1,285 @@
+/* Login Container */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: black;
+    background-image: linear-gradient(rgba(0,0,0,0.8),rgba(0,0,0,0.7)),url("../images/martin-scorsese-1024x576.webp");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center center;
+}
+
+/* Main Login Box - Glassmorphism Style */
+.login-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 40px 40px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Login Title */
+.login-title {
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.95);
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 1.5px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+/* Form Styling */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.login-form input {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.3px;
+}
+
+.login-form input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.login-form input:focus {
+    border-color: rgba(255, 18, 18, 0.5);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 8px rgba(255, 18, 18, 0.15);
+}
+
+.login-form input.input-error {
+    border-color: rgba(255, 18, 18, 0.7);
+    background-color: rgba(255, 18, 18, 0.08);
+}
+
+.login-form input.input-error:focus {
+    box-shadow: 0 0 8px rgba(255, 18, 18, 0.3);
+}
+
+/* Error Messages */
+.error-message {
+    color: rgba(255, 100, 100, 0.9);
+    font-size: 0.8rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.form-error {
+    margin: 8px 0;
+    text-align: left;
+}
+
+/* Password Field with Eye Icon */
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 45px;
+}
+
+.eye-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 8px;
+    transition: all 0.2s ease;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eye-toggle:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.eye-toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Forgot Password */
+.forgot-password {
+    text-align:left;
+    margin: 12px 0 20px 0;
+}
+
+.forgot-password a {
+    color: rgba(255, 18, 18, 0.8);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+}
+
+.forgot-password a:hover {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: underline;
+}
+
+/* Button Styles */
+.login-button {
+    padding: 12px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    background-color: rgba(161, 0, 0, 0.4);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.login-button:hover:not(:disabled) {
+    background-color: rgb(180, 20, 20);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 18, 18, 0.3);
+}
+
+.login-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Divider Text */
+.divider-text {
+    color: rgba(255, 255, 255, 0.4);
+    margin: 20px 0 16px 0;
+    font-size: 0.85rem;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.3px;
+    font-weight: 500;
+}
+
+/* Social Buttons */
+.social-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.social-btn {
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.social-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2px);
+}
+
+.google-btn {
+    color: #4285f4;
+}
+
+.google-btn:hover {
+    background-color: rgba(66, 133, 244, 0.1);
+}
+
+/* Auth Links */
+.auth-links {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.3px;
+    font-weight: 500;
+}
+
+.signup-link {
+    color: rgba(255, 18, 18, 0.85);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.signup-link:hover {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-title {
+        font-size: 1.6rem;
+        letter-spacing: 1px;
+    }
+
+    .login-box {
+        padding: 30px 25px;
+        max-width: 100%;
+    }
+
+    .login-form input {
+        padding: 11px 14px;
+        font-size: 0.9rem;
+    }
+
+    .login-button {
+        padding: 11px 18px;
+        font-size: 0.95rem;
+    }
+
+    .social-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .social-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+}

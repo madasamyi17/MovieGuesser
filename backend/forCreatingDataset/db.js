@@ -6,19 +6,19 @@ dotenv.config();
 console.log("USER:", process.env.DB_USER);
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  port: process.env.DB_PORT || 3306 ,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-   ssl: {
-    rejectUnauthorized: true
-  },
-  // host: "localhost",
-  // port:3306,
-  // user: "root",
-  // password: "root",
-  // database: "movie_db"
+  // host: process.env.DB_HOST,
+  // user: process.env.DB_USER,
+  // port: process.env.DB_PORT || 3306 ,
+  // password: process.env.DB_PASSWORD,
+  // database: process.env.DB_NAME,
+  //  ssl: {
+  //   rejectUnauthorized: true
+  // },
+  host: "localhost",
+  port:3306,
+  user: "root",
+  password: "root",
+  database: "movie_db"
 });
 
 

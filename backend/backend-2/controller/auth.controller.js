@@ -1,0 +1,233 @@
+const axios = require('axios');
+require('dotenv').config();
+const pool = require('../config/db');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { issueJWT } = require('../utils/jwt');
+const { setAuthCookie } = require('../utils/cookies');
+const { findUserByEmail,createUser } = require('../services/user.service');
+const { createAuthAccount } = require('../services/authAccount.service');
+
+
+const O_AUTH_CLIENT_ID = "265094258473-dk4rqre1u96car0d8effb4aoims7rhgc.apps.googleusercontent.com"
+const O_AUTH_CLIENT_SECRET = "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"
+const O_AUTH_REDIRECT_URL = "http://localhost:3000/auth/google/callback"
+
+exports.googleLogin = (req, res) => {
+    try {
+        // console.log(O_AUTH_CLIENT_ID)
+        const params = new URLSearchParams({
+            client_id: O_AUTH_CLIENT_ID,
+            redirect_uri: O_AUTH_REDIRECT_URL,
+            response_type: 'code',
+            scope: 'openid email profile',
+            access_type: 'offline',
+            prompt: 'consent'
+        });
+
+        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+        res.redirect(googleAuthUrl);
+    }
+    catch (error) {
+        console.error("Error during Google OAuth login:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+
+};
+
+exports.googleCallback = async (req, res) => {
+    const code = req.query.code;
+    try {
+        const params = new URLSearchParams({
+            client_id: O_AUTH_CLIENT_ID,
+            client_secret: O_AUTH_CLIENT_SECRET,
+            code: code,
+            grant_type: 'authorization_code',
+            redirect_uri: O_AUTH_REDIRECT_URL
+        });
+
+        const tokenResponse = await axios.post("https://oauth2.googleapis.com/token", params.toString(), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        console.log("tokenResponse.data", tokenResponse.data);
+        const accessToken = tokenResponse.data.access_token;
+
+        const userResponse = await axios.get("https://www.googleapis.com/oauth2/v2/userinfo", {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        const { email, name, id: googleId } = userResponse.data;
+        console.log("Google user info:", userResponse.data);
+
+        const connection = await pool.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            let user = await findUserByEmail(email);
+            let userId;
+
+            if (!user) {
+                userId = await createUser(connection, { email, name });
+            } else {
+                userId = user.id;
+            }
+
+            // check if google auth exists
+            const [rows] = await connection.query(
+                'SELECT id FROM auth_accounts WHERE provider = ? AND provider_id = ?',
+                ['google', googleId]
+            );
+
+            if (rows.length === 0) {
+                await createAuthAccount(connection, {
+                    user_id: userId,
+                    provider: 'google',
+                    provider_user_id: googleId
+                });
+            }
+
+            await connection.commit();
+
+            const token = issueJWT({ id: userId, email });
+            setAuthCookie(res, token);
+
+            return res.redirect('http://localhost:5173/movieguess'); // or frontend URL
+
+        } catch (err) {
+            await connection.rollback();
+            throw err;
+        } finally {
+            connection.release();
+        }
+    }
+    catch (error) {
+        console.error("Error during Google OAuth callback:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
+exports.register = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    // check if email already exists
+    const [existingUsers] = await pool.query(
+        'SELECT id FROM users WHERE email = ?',
+        [email]
+    );
+
+
+    if (existingUsers.length > 0) {
+        const connection = await pool.getConnection();
+
+        const[authContent] = await pool.query(
+            'SELECT id FROM auth_accounts WHERE user_id = ?',
+            [existingUsers[0].id]
+        );
+        if(authContent.length > 0){
+            try{
+                await createAuthAccount(connection, {
+                    user_id: existingUsers[0].id,
+                    provider: 'password',
+                    provider_user_id: null,
+                    password_hash: encryptedPassword
+                });
+            }
+            catch(err){
+                console.error("Error creating auth account for existing user:", err);
+                return res.status(500).json({ message: "Already registered with password" });
+            }
+            return res.status(201).json({ message: "User registered successfully" });
+        }
+        return res.status(409).json({ message: "Email already in use" });
+    }
+
+    const connection = await pool.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        // insert into users table
+        const [userResult] = await connection.query(
+            'INSERT INTO users (name, email) VALUES (?, ?)',
+            [email, email]
+        );
+
+        const user_id = userResult.insertId;
+
+        // insert into auth_accounts table
+        await connection.query( 
+            'INSERT INTO auth_accounts (user_id, provider, password_hash) VALUES (?, ?, ?)',
+            [user_id, 'password', encryptedPassword]
+        );
+
+        await connection.commit();
+
+        return res.status(201).json({ message: "User registered successfully" });
+    } catch (error) {
+        await connection.rollback();
+        console.error("Error during user registration:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    } finally {
+        connection.release();
+    }
+};
+
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    const [users] = await pool.query(
+        'SELECT * from users where email = ?',
+        [email]
+    );
+    if (users.length === 0) {
+        return res.status(401).json({ message: "Invalid email or password" });
+    }
+    const user_id = users[0].id;
+    const [authAccounts] = await pool.query(
+        'SELECT * from auth_accounts where user_id = ? AND provider = ?',
+        [user_id, 'password']
+    );
+    if (authAccounts.length === 0) {
+        return res.status(401).json({ message: "Invalid email or password" });
+    }
+    const passwordHash = authAccounts[0].password_hash;
+    const passwordMatch = await bcrypt.compare(password, passwordHash);
+    if (!passwordMatch) {
+        return res.status(401).json({ message: "Invalid email or password" });
+    }
+    const token = issueJWT(users[0]);
+    setAuthCookie(res, token);
+    return res.status(200).json({ message: "Login successful" });
+}
+
+exports.me = async (req, res) => {
+    try {
+        const user_id = req.user.user_id;
+
+        const [users] = await pool.query(
+            'SELECT id, name, email FROM users WHERE id = ?',
+            [user_id]
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json({ user: users[0] });
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
