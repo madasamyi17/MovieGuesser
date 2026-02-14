@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./LoginPage.css";
 
 const LoginPage = () => {
@@ -8,6 +10,39 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/auth/me",
+          {},
+          { withCredentials: true }
+        );
+        if (response.status === 200) {
+          navigate("/movieguess", { replace: true });
+        }
+      } catch (error) {
+        // Not authenticated, stay on login page
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  // Check for auth errors from Google OAuth
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authError = urlParams.get('error');
+    
+    if (authError) {
+      setErrors({ form: "Google authentication failed. Please try again." });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -39,15 +74,19 @@ const LoginPage = () => {
     setErrors({});
     setLoading(true);
     try {
-      console.log("hi");
-     const resp = axios.post('http://localhost:3000/auth/login', { email, password }, {
-        withCredentials: true,
-      });
-      if(resp.status === 200){
+      const resp = await axios.post(
+        "http://localhost:3000/auth/login",
+        { email, password },
+        {
+          withCredentials: true, // This ensures cookies are sent and received
+        }
+      );
+      if (resp.status === 200) {
         console.log("Login successful:", resp.data);
+        // Backend sets httpOnly cookie, just mark as authenticated
+        login(null); // Cookie is automatically handled by withCredentials
         navigate("/movieguess");
-      }
-      else{
+      } else {
         setErrors({ form: "Invalid email or password" });
       }
     } catch (err) {
@@ -59,8 +98,13 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    console.log("Google login clicked");
-    window.location.href = "http://localhost:3000/auth/google";
+    console.log("Google login clicked - redirecting to backend");
+    try {
+      window.location.href = "http://localhost:3000/auth/google";
+    } catch (error) {
+      console.error("Error initiating Google login:", error);
+      setErrors({ form: "Failed to initiate Google login" });
+    }
   };
 
   const togglePasswordVisibility = () => {

@@ -1,65 +1,100 @@
+/* Clue Overlay - Glassmorphism Style */
 .clue-overlay {
   position: fixed;
-  top: 20%;
+  top: 15%;
   left: 50%;
-  transform: translate(-50%, -100%);
-  background: rgba(0, 0, 0, 0.593);
+  transform: translate(-50%, 0);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
-  padding: 5px 30px;
-  border-radius: 20px;
+  padding: 30px 40px;
+  border-radius: 12px;
   z-index: 999;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 80%;
-  width: 40%;
-  height: fit-content;
+  max-width: 85%;
+  width: 500px;
+  max-height: 50vh;
+  overflow-y: auto;
   text-align: center;
+  animation: slideIn 0.3s ease-out;
 }
 
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
 
+/* Close Button */
 .close-btn {
   position: absolute;
-  top: 25px;
-  right: 30px;
-  background: transparent;
-  border: none;
-  font-size: 2.5rem;
-  color: white;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  width: 35px;
+  height: 35px;
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   z-index: 1000;
-  transition: transform 0.2s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
 }
 
 .close-btn:hover {
-  transform: scale(1.2);
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.95);
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
-.cluecard{
-   text-align: top;
-}
-.ClueHeading{
-    font-family:'Courier New', Courier, monospace;
-    font-size: 1.5rem;
-    text-align: top;
-    color: white;
-}
-
-.clueText{
-  font-family: 'Courier New', Courier, monospace;
-  color: white; /* Ensure text is white */
+.cluecard {
   text-align: center;
-  padding: 0 20px;
+  width: 100%;
 }
 
+.ClueHeading {
+  font-family: 'Anton', sans-serif;
+  font-size: 1.8rem;
+  text-align: center;
+  color: rgba(255, 18, 18, 0.85);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0 0 20px 0;
+  font-weight: bold;
+}
+
+.clueText {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  padding: 10px 0;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* Score Overlay - Full Screen */
 .score-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.95); /* Full black overlay */
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(8px);
   z-index: 998;
   display: flex;
@@ -69,21 +104,26 @@
   color: white;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   text-align: center;
-  border-radius: 0; /* Full screen, no rounding */
+  border-radius: 0;
   animation: fadeInScreen 0.7s ease-in-out;
 }
+
 @keyframes fadeInScreen {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
-
 .gameover-title {
-  color: red;
+  color: rgba(255, 18, 18, 0.85);
   font-size: 4rem;
   font-weight: bold;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Anton', sans-serif;
   letter-spacing: 10px;
+  text-transform: uppercase;
   animation: popIn 1s ease-out forwards;
   margin-bottom: 20px;
 }
@@ -97,105 +137,226 @@
     transform: scale(1);
   }
 }
+
 .score {
-  color: white;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1.5rem;
   font-weight: 500;
+  font-family: 'Poppins', sans-serif;
   animation: slowrise 1s ease-out forwards;
+  margin-bottom: 30px;
 }
 
 @keyframes slowrise {
   0% {
     opacity: 0;
   }
-  80%{
+  80% {
     opacity: 0;
   }
-  100%{
+  100% {
     opacity: 1;
   }
-} 
+}
 
-.leaderboard{
-  height: 6%;
-  width: 10%;
+/* Score Card Actions */
+.score-card-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.score-action-btn {
+  padding: 12px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  background-color: rgba(30, 30, 30, 0.95);
-  color: white;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
   font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
-.leaderboard:hover{
-  background-color: rgb(127, 6, 6)  ;
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+
+.score-action-btn svg {
+  display: block;
 }
 
+.leaderboard-btn {
+  background-color: rgba(161, 0, 0, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+}
 
+.leaderboard-btn:hover {
+  background-color: rgb(180, 20, 20);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 18, 18, 0.3);
+}
 
+.quit-btn {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
 
+.quit-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.95);
+  transform: translateY(-2px);
+}
 
-@media (max-width:768px) {
-     .clue-overlay{
-    top: 20%;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .clue-overlay {
+    top: 12%;
     left: 50%;
-    padding: 5px 3px;
-    border-radius: 20px;
-    width: 90%;
+    transform: translate(-50%, 0);
+    padding: 20px;
+    width: 80%;
+    max-width: 400px;
+    max-height: 45vh;
   }
 
-  .ClueHeading{
-    font-family:'Courier New', Courier, monospace;
+  .ClueHeading {
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .clueText {
+    font-size: 0.95rem;
+    padding: 8px 0;
+    line-height: 1.5;
+  }
+
+  .close-btn {
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+  }
+
+  .gameover-title {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    letter-spacing: 5px;
+  }
+
+  .score {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+
+  .score-action-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .clue-overlay {
+    top: 12%;
+    width: calc(100% - 30px);
+    padding: 18px 15px;
+    max-width: 100%;
+    max-height: 40vh;
+  }
+
+  .ClueHeading {
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+
+  .clueText {
+    font-size: 0.85rem;
+    padding: 6px 0;
+    line-height: 1.4;
+  }
+
+  .close-btn {
+    top: 8px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    font-size: 18px;
+  }
+
+  .gameover-title {
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+  }
+
+  .score {
+    font-size: 1rem;
+  }
+
+  .score-card-actions {
+    gap: 10px;
+  }
+
+  .score-action-btn {
+    padding: 9px 16px;
     font-size: 0.8rem;
-    text-align: top;
-    color: white;
+    min-width: 100px;
+  }
 }
 
-.clueText{
-  font-family: 'Courier New', Courier, monospace;
-  color: white; /* Ensure text is white */
-  text-align: center;
-  padding: 0 20px;
-  font-size: small;
-}
-.close-btn {
-  position: absolute;
-  top: 5%;
-  right: 0%;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  transition: transform 0.2s ease;
-}
-.score-overlay{
-  padding: 0%;
-  width: 100%;
-  height: 100%;
-}
-.gameover-title{
-  font-size: 2rem;
-  margin-bottom: 10px;
-  letter-spacing: 10px;
-}
-.leaderboard{
-  height: 6%;
-  width: 40%;
-  border-radius: 8px;
-  background-color: rgba(30, 30, 30, 0.95);
-  color: white;
-  font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
-}
-.leaderboard:hover{
-  background-color: rgb(127, 6, 6)  ;
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
-}
+/* Extra small devices */
+@media (max-width: 360px) {
+  .clue-overlay {
+    top: 10%;
+    width: calc(100% - 24px);
+    padding: 15px 12px;
+    max-height: 38vh;
+  }
 
+  .ClueHeading {
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+    margin-bottom: 8px;
+  }
+
+  .clueText {
+    font-size: 0.8rem;
+    padding: 5px 0;
+    line-height: 1.35;
+  }
+
+  .close-btn {
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+  }
+
+  .gameover-title {
+    font-size: 1.6rem;
+    letter-spacing: 2px;
+  }
+
+  .score {
+    font-size: 0.9rem;
+  }
+
+  .score-action-btn {
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
+
+  .score-action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
 }

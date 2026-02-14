@@ -1,3 +1,4 @@
+/* Movie Guess Home Container */
 .movie-guess-container {
   display: flex;
   flex-direction: column;
@@ -9,19 +10,23 @@
   justify-content: center;
 }
 
+/* Main Title */
 h1 {
-  font-size: 20dvh;
+  font-size: 20vh;
   text-align: center;
-  color: rgb(189, 0, 0);
+  color: rgba(255, 18, 18, 0.85);
   font-family: 'Anton', sans-serif;
-  opacity: 60%;
+  opacity: 0.8;
   letter-spacing: 15px;
   text-transform: uppercase;
 }
+
+/* Loading Dots Animation */
 .dots::after {
   content: ".";
   animation: dots 1.5s steps(1, end) infinite;
 }
+
 @keyframes dots {
   0% {
     content: ".";
@@ -37,50 +42,53 @@ h1 {
   }
 }
 
+/* Start Button - Matching login theme */
 .start-button {
-  height: 7%;
-  width: 15%;
+  padding: 12px 24px;
+  min-width: 180px;
   border-radius: 8px;
-  background-color: rgba(161, 0, 0, 0);
-  color: rgba(223, 223, 223, 0.803);
-  font-family: 'Anton', sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: rgba(161, 0, 0, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
   text-transform: uppercase;
-  letter-spacing: .2cap;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  letter-spacing: 0.8px;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
 }
 
 .start-button:hover {
- background-color: rgb(127, 6, 6)  ;
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+  background-color: rgb(180, 20, 20);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 18, 18, 0.3);
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
   h1 {
-    font-size: 10dvh;
+    font-size: 10vh;
     letter-spacing: 5px;
   }
 
   .start-button {
-    height: 5%;
-    width: 50%;
-    border-radius: 8px;
-    background-color:rgba(172, 0, 0, 0.737);
-    color: rgba(255, 255, 255, 0.901);
-    font-size: small;
-    text-transform: uppercase;
-    font-weight: 200;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
+    padding: 11px 20px;
+    min-width: 50%;
+    font-size: 0.9rem;
   }
-  .start-button:hover {
-    background-color: rgba(39, 2, 2, 0.125);
-    transform: scale(1.05);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 8vh;
+    letter-spacing: 3px;
+  }
+
+  .start-button {
+    padding: 10px 18px;
+    width: 60%;
+    font-size: 0.85rem;
   }
 }

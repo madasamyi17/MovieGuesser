@@ -37,7 +37,12 @@ exports.googleLogin = (req, res) => {
 
 exports.googleCallback = async (req, res) => {
     const code = req.query.code;
+    let connection;
     try {
+        if (!code) {
+            return res.status(400).json({ message: "Authorization code not provided" });
+        }
+
         const params = new URLSearchParams({
             client_id: O_AUTH_CLIENT_ID,
             client_secret: O_AUTH_CLIENT_SECRET,
@@ -62,50 +67,53 @@ exports.googleCallback = async (req, res) => {
         const { email, name, id: googleId } = userResponse.data;
         console.log("Google user info:", userResponse.data);
 
-        const connection = await pool.getConnection();
-        try {
-            await connection.beginTransaction();
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-            let user = await findUserByEmail(email);
-            let userId;
+        let user = await findUserByEmail(email);
+        let userId;
 
-            if (!user) {
-                userId = await createUser(connection, { email, name });
-            } else {
-                userId = user.id;
-            }
-
-            // check if google auth exists
-            const [rows] = await connection.query(
-                'SELECT id FROM auth_accounts WHERE provider = ? AND provider_id = ?',
-                ['google', googleId]
-            );
-
-            if (rows.length === 0) {
-                await createAuthAccount(connection, {
-                    user_id: userId,
-                    provider: 'google',
-                    provider_user_id: googleId
-                });
-            }
-
-            await connection.commit();
-
-            const token = issueJWT({ id: userId, email });
-            setAuthCookie(res, token);
-
-            return res.redirect('http://localhost:5173/movieguess'); // or frontend URL
-
-        } catch (err) {
-            await connection.rollback();
-            throw err;
-        } finally {
-            connection.release();
+        if (!user) {
+            userId = await createUser(connection, { email, name });
+        } else {
+            userId = user.id;
         }
+
+        // check if google auth exists
+        const [rows] = await connection.query(
+            'SELECT id FROM auth_accounts WHERE provider = ? AND provider_id = ?',
+            ['google', googleId]
+        );
+
+        if (rows.length === 0) {
+            await createAuthAccount(connection, {
+                user_id: userId,
+                provider: 'google',
+                provider_user_id: googleId
+            });
+        }
+
+        await connection.commit();
+        connection.release();
+
+        const token = issueJWT({ id: userId, email });
+        setAuthCookie(res, token);
+
+        // Redirect directly to movieguess page
+        // ProtectedRoute will check auth on page load
+        return res.redirect('http://localhost:5173/movieguess');
     }
     catch (error) {
         console.error("Error during Google OAuth callback:", error);
-        res.status(500).json({ message: "Internal Server Error" });
+        if (connection) {
+            try {
+                await connection.rollback();
+                connection.release();
+            } catch (rollbackErr) {
+                console.error("Rollback error:", rollbackErr);
+            }
+        }
+        return res.redirect('http://localhost:5173/login?error=auth_failed');
     }
 };
 
@@ -184,6 +192,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
+    console.log("Login attempt with email:", email);
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required" });
     }
@@ -215,6 +224,7 @@ exports.login = async (req, res) => {
 
 exports.me = async (req, res) => {
     try {
+        console.log("hi");
         const user_id = req.user.user_id;
 
         const [users] = await pool.query(
@@ -228,6 +238,113 @@ exports.me = async (req, res) => {
         return res.status(200).json({ user: users[0] });
     } catch (error) {
         console.error("Error fetching user profile:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+exports.getProfile = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        const { findUserById } = require('../services/user.service');
+        
+        const user = await findUserById(userId);
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Convert profile image to base64 if exists
+        const response = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            created_at: user.created_at
+        };
+
+        if (user.profile_image) {
+            response.profile_image = user.profile_image.toString('base64');
+            response.image_type = user.image_type;
+        }
+
+        return res.status(200).json({ user: response });
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+exports.updateUsername = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        const { name } = req.body;
+
+        if (!name || name.trim().length === 0) {
+            return res.status(400).json({ message: "Name cannot be empty" });
+        }
+
+        const trimmedName = name.trim();
+
+        const { checkNameAvailability, updateUserName } = require('../services/user.service');
+        
+        // Check if name is available
+        const isAvailable = await checkNameAvailability(trimmedName, userId);
+        
+        if (!isAvailable) {
+            return res.status(409).json({ message: "This username is already taken" });
+        }
+
+        // Update the name
+        const updated = await updateUserName(userId, trimmedName);
+        
+        if (!updated) {
+            return res.status(500).json({ message: "Failed to update name" });
+        }
+
+        return res.status(200).json({ 
+            message: "Name updated successfully",
+            name: trimmedName 
+        });
+    } catch (error) {
+        console.error("Error updating username:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+exports.updateProfileImage = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        
+        if (!req.file) {
+            return res.status(400).json({ message: "No image file provided" });
+        }
+
+        const { buffer, mimetype, size } = req.file;
+
+        // Validate file size (max 5MB)
+        if (size > 5 * 1024 * 1024) {
+            return res.status(400).json({ message: "Image size must be less than 5MB" });
+        }
+
+        // Validate file type
+        if (!mimetype.startsWith('image/')) {
+            return res.status(400).json({ message: "File must be an image" });
+        }
+
+        const { updateUserProfileImage } = require('../services/user.service');
+        
+        const updated = await updateUserProfileImage(userId, buffer, mimetype, size);
+        
+        if (!updated) {
+            return res.status(500).json({ message: "Failed to update profile image" });
+        }
+
+        return res.status(200).json({ 
+            message: "Profile image updated successfully",
+            profile_image: buffer.toString('base64'),
+            image_type: mimetype
+        });
+    } catch (error) {
+        console.error("Error updating profile image:", error);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };

@@ -1,8 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 
 const authController = require('../controller/auth.controller');
 const { authMiddleware } = require('../middleware/auth.middleware');
+
+// Configure multer for memory storage
+const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
+
 router.get('/', (req, res) => {
     res.send('Hello World!');
 });
@@ -10,6 +18,9 @@ router.get('/', (req, res) => {
 router.post('/auth/register', authController.register);
 router.post('/auth/login', authController.login);
 router.post('/auth/me', authMiddleware, authController.me);
+router.get('/auth/profile', authMiddleware, authController.getProfile);
+router.put('/auth/profile/username', authMiddleware, authController.updateUsername);
+router.put('/auth/profile/image', authMiddleware, upload.single('image'), authController.updateProfileImage);
 router.get('/auth/google', authController.googleLogin);
 router.get('/auth/google/callback', authController.googleCallback);
 

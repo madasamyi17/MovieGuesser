@@ -1,3 +1,4 @@
+/* Instructions Container - Glassmorphism Style */
 .instruction-container {
   display: flex;
   flex-direction: column;
@@ -6,14 +7,15 @@
   justify-content: center;
   justify-items: center;
   min-height: 100vh;
-  min-width: 100dvw;
+  min-width: 100vw;
 }
 
+/* Instructions Box - Matching login glassmorphism */
 .instructions-box {
   background: rgba(255, 255, 255, 0.05);
   border: 1.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  padding: 20px 30px;
+  border-radius: 12px;
+  padding: 30px 40px;
   text-align: left;
   backdrop-filter: blur(8px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
@@ -25,49 +27,85 @@
   overflow-y: auto;
 }
 
+/* Instructions Heading */
 .instructions-heading {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: bold;
   text-transform: uppercase;
-  font-family: 'Anton';
-  color: rgba(255, 0, 0, 0.727); /* yellow-ish to contrast red title */
+  font-family: 'Anton', sans-serif;
+  color: rgba(255, 18, 18, 0.85);
   text-align: center;
-   letter-spacing: 0.5dvw;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
 }
 
+/* Instruction Text */
 .instruction-text {
   font-size: 1rem;
   font-weight: 300;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Poppins', sans-serif;
   opacity: 0.9;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  line-height: 1.6;
 }
 
+/* Get Started Button */
 .Get-Started-button {
-  height: 30px;
-  width: 10%;
+  padding: 12px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  background-color: rgba(30, 30, 30, 0.95);
-  color: white;
-  font-family: 'Anton';
-  font-weight: 50;
-  letter-spacing: 1px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  background-color: rgba(161, 0, 0, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+  min-width: 150px;
 }
-.Get-Started-button:hover{
-  background-color: rgb(127, 6, 6)  ;
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+
+.Get-Started-button:hover {
+  background-color: rgb(180, 20, 20);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 18, 18, 0.3);
 }
-@media (max-width:768px){
-  .instructions-box{
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .instructions-box {
     width: 70%;
-  }
-  .Get-Started-button{
-    width: 30%;
+    padding: 20px 25px;
   }
 
+  .instructions-heading {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+
+  .instruction-text {
+    font-size: 0.9rem;
+  }
+
+  .Get-Started-button {
+    width: 50%;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .instructions-box {
+    width: 85%;
+  }
+
+  .instructions-heading {
+    font-size: 1.3rem;
+  }
+
+  .instruction-text {
+    font-size: 0.85rem;
+  }
 }

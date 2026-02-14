@@ -1,48 +1,71 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import '../css/overlay.css'
+
 function ScoreCard(props) {
   const navigate = useNavigate();
-  console.log("Name at ScoreCard", props.name);
-  // const name = state.location?.name || "";
-  // const score = state.location?.score || 0;
+
   async function handlegetLeaderboard(name, score) {
-    // alert("LeaderBoard feature will be added soon");
-    // console.log("hi");
     try {
-      const topscorers = await axios.post(
-       `${import.meta.env.VITE_BACKEND_URL}/movieguess`,
-        {
-          username: name,
-          score: score,
-        },
-        { params: { type: "leaderboard" } }
+      // Fetch full leaderboard
+      const response = await axios.get(
+        `http://localhost:3000/api/leaderboard?limit=50`
       );
-      // console.log(topscorers.data);
       navigate("/leaderboard", {
-        state: { leaderboard: topscorers.data , name:name},
+        state: { 
+          leaderboard: response.data.data || [],
+          name: name,
+          currentScore: score,
+          totalScore: props.totalScore || score,
+          maxScore: props.maxScore || score
+        },
       });
     } catch (error) {
       console.log("Error in getting leaderboard", error);
+      // Navigate anyway with empty leaderboard
+      navigate("/leaderboard", {
+        state: { 
+          leaderboard: [],
+          name: name,
+          currentScore: score,
+          totalScore: props.totalScore || score,
+          maxScore: props.maxScore || score
+        },
+      });
     }
   }
- // console.log(props.score, props.name);
+
+  const handleQuit = () => {
+    navigate("/");
+  };
+
   return (
-    <>
-      <div className="score-overlay">
-        <div className="gameover-title">GAME OVER</div>
-        <p className="score">Your score is :{props.score}</p>
+    <div className="score-overlay">
+      <div className="gameover-title">GAME OVER</div>
+      <p className="score">Your score is: {props.score}</p>
+      <div className="score-card-actions">
         <button
-          className="leaderboard"
-          onClick={() => {
-            // console.log(props.name, props.score);
-            handlegetLeaderboard(props.name,props.score);
-          }}
+          className="score-action-btn leaderboard-btn"
+          onClick={() => handlegetLeaderboard(props.name, props.score)}
         >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="8" r="7"></circle>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+          </svg>
           Leaderboard
         </button>
+        <button
+          className="score-action-btn quit-btn"
+          onClick={handleQuit}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Quit
+        </button>
       </div>
-    </>
+    </div>
   );
 }
 

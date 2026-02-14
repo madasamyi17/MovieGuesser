@@ -3,6 +3,8 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 require('dotenv').config();
 const authRoutes = require('./routes/auth.routes');
+const movieRoutes = require('./routes/movie.routes');
+const leaderboardRoutes = require('./routes/leaderboard.routes');
 
 const app = express();
 app.use(cors({
@@ -15,5 +17,7 @@ app.use(cookieParser());
 
 
 app.use('/', authRoutes);
+app.use('/api', movieRoutes);
+app.use('/api', leaderboardRoutes);
 
 module.exports = app;

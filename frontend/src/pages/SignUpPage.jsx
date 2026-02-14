@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./SignUpPage.css";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -48,19 +50,24 @@ const SignUpPage = () => {
 
     setErrors({});
     setLoading(true);
-    // TODO: Implement sign up logic
     try {
       if (!email || !password) {
         throw new Error("Email and password are required");
       }
-      console.log("hi");
-      const resp = await axios.post("http://localhost:3000/auth/register", {
-        email,
-        password,
-      });
+      const resp = await axios.post(
+        "http://localhost:3000/auth/register",
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true, // This ensures cookies are sent and received
+        }
+      );
       if (resp.status === 201) {
         console.log("Sign up successful:", resp.data);
-
+        // Backend sets httpOnly cookie, just mark as authenticated
+        login(null); // Cookie is automatically handled by withCredentials
         navigate("/movieguess");
       } else {
         alert("Sign up failed. Please try again.");
@@ -74,8 +81,13 @@ const SignUpPage = () => {
   };
 
   const handleGoogleSignUp = () => {
-    console.log("Google login clicked");
-    window.location.href = "http://localhost:3000/auth/google";
+    console.log("Google sign up clicked - redirecting to backend");
+    try {
+      window.location.href = "http://localhost:3000/auth/google";
+    } catch (error) {
+      console.error("Error initiating Google sign up:", error);
+      setErrors({ form: "Failed to initiate Google sign up" });
+    }
   };
 
   const togglePasswordVisibility = () => {

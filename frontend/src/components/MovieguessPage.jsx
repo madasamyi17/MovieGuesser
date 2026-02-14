@@ -3,7 +3,7 @@ import "../css/MovieguessPage.css";
 import axios from "axios";
 import "../css/overlay.css";
 import Clue from "./Clue";
-import ScoreCard from "./scoreCard";
+import ScoreCard from "./ScoreCard";
 import { useLocation } from "react-router-dom";
 
 function MovieGuessPage() {
@@ -56,7 +56,7 @@ const name = location.state?.name || "";
           fetchQuestion(); // Fetch the next question
         }, 3000);
       } else {
-        setFeedbackMessage(`❌ Wrong Answer,Original Answer is ${response.data.originalAnswer}`);
+        setFeedbackMessage(`Wrong Answer, Original Answer is ${response.data.originalAnswer}`);
         setTimeout(() => {setFeedbackMessage("");setShowScore(true)}, 3000);
       }
     } catch (error) {
@@ -71,7 +71,7 @@ const name = location.state?.name || "";
       setClueNo((c) => c + 1);
       if (clueNo >= 3) {
         // alert("No more clues available");
-        setFeedbackMessage("❌ No more clues available");
+        setFeedbackMessage("No more clues available");
         return;
       }
       // console.log(clueNo, questionNo);
