@@ -65,6 +65,16 @@
     letter-spacing: 0.3px;
 }
 
+.login-form input:-webkit-autofill,
+.login-form input:-webkit-autofill:hover,
+.login-form input:-webkit-autofill:focus,
+.login-form input:-webkit-autofill:active {
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.08) inset;
+    -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.08) inset;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
 .login-form input::placeholder {
     color: rgba(255, 255, 255, 0.4);
 }

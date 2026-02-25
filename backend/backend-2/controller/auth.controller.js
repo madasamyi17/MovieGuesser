@@ -7,6 +7,14 @@ const { issueJWT } = require('../utils/jwt');
 const { setAuthCookie } = require('../utils/cookies');
 const { findUserByEmail,createUser } = require('../services/user.service');
 const { createAuthAccount } = require('../services/authAccount.service');
+const { sendPasswordResetEmail } = require('../utils/mailer');
+const {
+    generateResetToken,
+    storeResetToken,
+    findValidToken,
+    deleteTokenById,
+    deleteAllUserTokens
+} = require('../services/passwordReset.service');
 
 
 const O_AUTH_CLIENT_ID = "265094258473-dk4rqre1u96car0d8effb4aoims7rhgc.apps.googleusercontent.com"
@@ -202,7 +210,7 @@ exports.login = async (req, res) => {
         [email]
     );
     if (users.length === 0) {
-        return res.status(401).json({ message: "Invalid email or password" });
+        return res.status(401).json({ message: "User not found" });
     }
     const user_id = users[0].id;
     const [authAccounts] = await pool.query(
@@ -221,6 +229,122 @@ exports.login = async (req, res) => {
     setAuthCookie(res, token);
     return res.status(200).json({ message: "Login successful" });
 }
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email || !email.trim()) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const user = await findUserByEmail(normalizedEmail);
+
+        if (!user) {
+            return res.status(200).json({ message: 'If the email is registered, a reset link has been sent.' });
+        }
+
+        const token = generateResetToken();
+        const expiresInMinutes = Number(process.env.RESET_TOKEN_EXPIRY_MINUTES || 30);
+        const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
+
+        await storeResetToken(user.id, token, expiresAt);
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const resetUrl = `${frontendUrl}/reset-password/${token}`;
+
+        await sendPasswordResetEmail({
+            to: user.email,
+            resetUrl
+        });
+
+        return res.status(200).json({ message: 'If the email is registered, a reset link has been sent.' });
+    } catch (error) {
+        console.error('Error in forgotPassword:', error);
+        return res.status(500).json({ message: 'Unable to process password reset request.' });
+    }
+};
+
+exports.verifyResetToken = async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        if (!token) {
+            return res.status(400).json({ message: 'Reset token is required' });
+        }
+
+        const tokenRow = await findValidToken(token);
+
+        if (!tokenRow) {
+            return res.status(400).json({ message: 'Reset link is invalid or expired' });
+        }
+
+        return res.status(200).json({ message: 'Reset token is valid' });
+    } catch (error) {
+        console.error('Error in verifyResetToken:', error);
+        return res.status(500).json({ message: 'Unable to verify reset link.' });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    let connection;
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+
+        if (!token) {
+            return res.status(400).json({ message: 'Reset token is required' });
+        }
+
+        if (!password || password.trim().length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters' });
+        }
+
+        const tokenRow = await findValidToken(token);
+
+        if (!tokenRow) {
+            return res.status(400).json({ message: 'Reset link is invalid or expired' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        const [existingPasswordAuth] = await connection.query(
+            'SELECT id FROM auth_accounts WHERE user_id = ? AND provider = ? LIMIT 1',
+            [tokenRow.user_id, 'password']
+        );
+
+        if (existingPasswordAuth.length > 0) {
+            await connection.query(
+                'UPDATE auth_accounts SET password_hash = ? WHERE user_id = ? AND provider = ?',
+                [hashedPassword, tokenRow.user_id, 'password']
+            );
+        } else {
+            await connection.query(
+                'INSERT INTO auth_accounts (user_id, provider, password_hash) VALUES (?, ?, ?)',
+                [tokenRow.user_id, 'password', hashedPassword]
+            );
+        }
+
+        await deleteTokenById(connection, tokenRow.id);
+        await deleteAllUserTokens(connection, tokenRow.user_id);
+
+        await connection.commit();
+        return res.status(200).json({ message: 'Password reset successful. Please login.' });
+    } catch (error) {
+        console.error('Error in resetPassword:', error);
+        if (connection) {
+            await connection.rollback();
+        }
+        return res.status(500).json({ message: 'Unable to reset password.' });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+};
 
 exports.me = async (req, res) => {
     try {

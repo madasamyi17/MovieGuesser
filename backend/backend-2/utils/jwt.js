@@ -1,14 +1,17 @@
 const jwt = require('jsonwebtoken');
 
 exports.issueJWT = (user) => {
+    const secret = process.env.JWT_SECRET || 'SECRET-KEY-ME';
+    const expiresIn = process.env.JWT_EXPIRES_IN || '2h';
+
     return jwt.sign(
         {
             user_id: user.id,
             email: user.email
         },
-        'SECRET-KEY-ME',
+        secret,
         {
-            expiresIn: '2h',
+            expiresIn,
             algorithm: 'HS256'
         }
     );

@@ -86,7 +86,11 @@ const LoginPage = () => {
         // Backend sets httpOnly cookie, just mark as authenticated
         login(null); // Cookie is automatically handled by withCredentials
         navigate("/movieguess");
-      } else {
+      }
+      else if(resp.data && resp.data.message ==="User not found"){
+        setErrors({ form: "User not found. Please check your email." });
+      }
+       else {
         setErrors({ form: "Invalid email or password" });
       }
     } catch (err) {
@@ -175,7 +179,7 @@ const LoginPage = () => {
         </form>
 
         <div className="forgot-password">
-          <a href="#forgot">Forgot Password?</a>
+          <a href="/forgot-password">Forgot Password?</a>
         </div>
 
         <div className="divider-text">or you can sign in with</div>

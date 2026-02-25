@@ -17,6 +17,9 @@ router.get('/', (req, res) => {
 
 router.post('/auth/register', authController.register);
 router.post('/auth/login', authController.login);
+router.post('/auth/forgot-password', authController.forgotPassword);
+router.get('/auth/reset-password/verify/:token', authController.verifyResetToken);
+router.post('/auth/reset-password/:token', authController.resetPassword);
 router.post('/auth/me', authMiddleware, authController.me);
 router.get('/auth/profile', authMiddleware, authController.getProfile);
 router.put('/auth/profile/username', authMiddleware, authController.updateUsername);
