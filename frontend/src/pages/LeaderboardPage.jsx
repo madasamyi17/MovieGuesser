@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../css/leaderboard.css";
@@ -6,15 +8,55 @@ function LeaderboardPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
-  const data = location.state?.leaderboard || [];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const name = location.state?.name || "";
   const currentScore = location.state?.currentScore || 0;
   const totalScore = location.state?.totalScore || 0;
   const maxScore = location.state?.maxScore || 0;
+  const totalGames = location.state?.totalGames || 0;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchLeaderboard = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const response = await axios.get("http://localhost:3000/api/leaderboard?limit=50");
+        if (isMounted) {
+          setData(response.data?.data || []);
+        }
+      } catch (fetchError) {
+        if (isMounted) {
+          setData([]);
+          setError("Failed to load leaderboard. Please try again.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchLeaderboard();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handlePlayAgain = () => {
     navigate("/movieguess", {
-      state: { name: name },
+      state: {
+        name: name,
+        totalScore: totalScore,
+        maxScore: maxScore,
+        totalGames: totalGames,
+      },
     });
   };
 
@@ -49,7 +91,11 @@ function LeaderboardPage() {
           </div>
         </div>
 
-        {data && data.length > 0 ? (
+        {loading ? (
+          <div className="no-data-message">Loading leaderboard...</div>
+        ) : error ? (
+          <div className="no-data-message">{error}</div>
+        ) : data.length > 0 ? (
           <table className="leaderboard-table">
             <thead>
               <tr>

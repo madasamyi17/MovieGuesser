@@ -2,12 +2,12 @@
 .instruction-container {
   display: flex;
   flex-direction: column;
-  justify-self: center;
   align-items: center;
   justify-content: center;
-  justify-items: center;
   min-height: 100vh;
-  min-width: 100vw;
+  width: 100%;
+  padding: 90px 16px 24px;
+  box-sizing: border-box;
 }
 
 /* Instructions Box - Matching login glassmorphism */
@@ -15,16 +15,18 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1.5px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  padding: 30px 40px;
+  padding: 28px 34px;
   text-align: left;
   backdrop-filter: blur(8px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   color: white;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  width: 30%;
+  width: min(760px, 92vw);
   margin-bottom: 20px;
+  max-height: min(78vh, 760px);
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 /* Instructions Heading */
@@ -48,6 +50,10 @@
   opacity: 0.9;
   margin-bottom: 12px;
   line-height: 1.6;
+}
+
+.instruction-text:last-child {
+  margin-bottom: 0;
 }
 
 /* Get Started Button */
@@ -75,9 +81,14 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .instruction-container {
+    padding: 78px 14px 20px;
+  }
+
   .instructions-box {
-    width: 70%;
-    padding: 20px 25px;
+    width: min(96vw, 640px);
+    padding: 22px 22px;
+    max-height: 80vh;
   }
 
   .instructions-heading {
@@ -90,22 +101,142 @@
   }
 
   .Get-Started-button {
-    width: 50%;
+    width: min(240px, 80vw);
     padding: 10px 20px;
     font-size: 0.9rem;
   }
 }
 
 @media (max-width: 480px) {
+  .instruction-container {
+    padding: 72px 12px 16px;
+  }
+
   .instructions-box {
-    width: 85%;
+    width: 100%;
+    padding: 20px 16px;
+    border-radius: 10px;
+    max-height: 82vh;
   }
 
   .instructions-heading {
     font-size: 1.3rem;
+    letter-spacing: 0.9px;
+    margin-bottom: 14px;
   }
 
   .instruction-text {
     font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .Get-Started-button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Help Modal Variant (opened from movie navbar) */
+.instructions-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.instructions-modal-card {
+  position: relative;
+  width: min(760px, 92vw);
+  max-height: 90vh;
+  display: flex;
+}
+
+.instructions-modal-box {
+  width: 100%;
+  margin-bottom: 0;
+  max-height: 90vh;
+  padding-top: 58px;
+}
+
+.instructions-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.instructions-close-btn:hover {
+  background: rgba(161, 0, 0, 0.45);
+  border-color: rgba(255, 18, 18, 0.55);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .instructions-modal-overlay {
+    padding: 14px;
+  }
+
+  .instructions-modal-card {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  .instructions-modal-box {
+    padding-top: 54px;
+    max-height: 88vh;
+  }
+
+  .instructions-close-btn {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .instructions-modal-overlay {
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .instructions-modal-card {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .instructions-modal-box {
+    padding: 50px 14px 18px;
+    max-height: 86vh;
+  }
+
+  .instructions-close-btn {
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 1.15rem;
   }
 }

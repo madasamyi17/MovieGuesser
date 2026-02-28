@@ -5,7 +5,7 @@ exports.getLeaderboard = async (req, res) => {
   let conn;
   try {
     const { limit = 50, offset = 0 } = req.query;
-
+    console.log("Leader borad data"); 
     conn = await pool.getConnection();
     const [rows] = await conn.query(
       `SELECT user_id, username, total_score, max_score, total_games, updated_at 
@@ -14,7 +14,7 @@ exports.getLeaderboard = async (req, res) => {
        LIMIT ? OFFSET ?`,
       [parseInt(limit), parseInt(offset)]
     );
-
+    console.log("Leader borad data",rows);  
     if (rows.length === 0) {
       return res.status(200).json({ 
         message: "No leaderboard entries found", 
@@ -82,10 +82,11 @@ exports.updateLeaderboardScore = async (req, res) => {
   let conn;
   try {
     const { user_id, username, current_score } = req.body;
+    const normalizedScore = Number(current_score);
 
-    if (!user_id || !username || current_score === undefined) {
+    if (!user_id || !username || current_score === undefined || Number.isNaN(normalizedScore)) {
       return res.status(400).json({ 
-        error: "Missing user_id, username, or current_score" 
+        error: "Missing or invalid user_id, username, or current_score" 
       });
     }
 
@@ -105,26 +106,26 @@ exports.updateLeaderboardScore = async (req, res) => {
 
       if (existingUser.length > 0) {
         // Update existing entry
-        newTotalScore = existingUser[0].total_score + current_score;
-        newMaxScore = Math.max(existingUser[0].max_score, current_score);
+        newTotalScore = Number(existingUser[0].total_score) + normalizedScore;
+        newMaxScore = Math.max(Number(existingUser[0].max_score), normalizedScore);
         newTotalGames = existingUser[0].total_games + 1;
 
         await conn.query(
           `UPDATE leader_board 
-           SET total_score = ?, max_score = ?, total_games = ?, updated_at = CURRENT_TIMESTAMP
+           SET username = ?, total_score = ?, max_score = ?, total_games = ?, updated_at = CURRENT_TIMESTAMP
            WHERE user_id = ?`,
-          [newTotalScore, newMaxScore, newTotalGames, user_id]
+          [username, newTotalScore, newMaxScore, newTotalGames, user_id]
         );
       } else {
         // Insert new entry
-        newTotalScore = current_score;
-        newMaxScore = current_score;
+        newTotalScore = normalizedScore;
+        newMaxScore = normalizedScore;
         newTotalGames = 1;
 
         await conn.query(
           `INSERT INTO leader_board (user_id, username, total_score, max_score, total_games)
            VALUES (?, ?, ?, ?, 1)`,
-          [user_id, username, current_score, current_score]
+          [user_id, username, normalizedScore, normalizedScore]
         );
       }
 
@@ -136,7 +137,7 @@ exports.updateLeaderboardScore = async (req, res) => {
         total_score: newTotalScore,
         max_score: newMaxScore,
         total_games: newTotalGames,
-        current_score: current_score
+        current_score: normalizedScore
       });
     } catch (error) {
       // Rollback transaction on error

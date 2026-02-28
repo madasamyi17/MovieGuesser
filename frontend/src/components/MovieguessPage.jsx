@@ -58,7 +58,7 @@ const name = location.state?.name || "";
       } else {
         setFeedbackMessage(`Wrong Answer, Original Answer is ${response.data.originalAnswer}`);
         setTimeout(() => {setFeedbackMessage("");setShowScore(true)}, 3000);
-      }
+      } 
     } catch (error) {
       console.error(error);
       setError("Failed to check answer. Please try again.");

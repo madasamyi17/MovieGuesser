@@ -31,8 +31,8 @@ function UserProfileCard({
       
       if (cached) {
         setProfileImage(cached.profileImage || defaultPic);
-        setDisplayName(cached.displayName || userProfile?.email || "Guest");
-        setEditedName(cached.displayName || userProfile?.email || "Guest");
+        setDisplayName(cached.displayName || name || userProfile?.email || "Guest");
+        setEditedName(cached.displayName || name || userProfile?.email || "Guest");
       } else {
         // Fetch from backend if not cached
         try {
@@ -47,7 +47,7 @@ function UserProfileCard({
             imageUrl = `data:${userData.image_type};base64,${userData.profile_image}`;
           }
           
-          const userName = userData.name || userProfile?.email || "Guest";
+          const userName = userData.name || name || userProfile?.email || "Guest";
           
           setProfileImage(imageUrl);
           setDisplayName(userName);
@@ -61,10 +61,10 @@ function UserProfileCard({
         } catch (error) {
           console.error("Error fetching profile:", error);
           // Fallback to defaults
-          const userName = userProfile?.email || "Guest";
+          const userName = name || userProfile?.email || "Guest";
           setDisplayName(userName);
           setEditedName(userName);
-          setProfileImage(defaultPic);
+          setProfileImage(userProfile?.picture || defaultPic);
         }
       }
     };
@@ -215,13 +215,21 @@ function UserProfileCard({
         
         {errorMessage && (
           <div className="profile-error-message">
-            <span className="icon-error">✕</span> {errorMessage}
+            <span className="icon-error">!</span>
+            <div className="profile-alert-content">
+              <span className="profile-alert-title">Update Failed</span>
+              <span className="profile-alert-text">{errorMessage}</span>
+            </div>
           </div>
         )}
         
         {successMessage && (
           <div className="profile-success-message">
-            <span className="icon-success">✓</span> {successMessage}
+            <span className="icon-success">✓</span>
+            <div className="profile-alert-content">
+              <span className="profile-alert-title">Updated</span>
+              <span className="profile-alert-text">{successMessage}</span>
+            </div>
           </div>
         )}
         

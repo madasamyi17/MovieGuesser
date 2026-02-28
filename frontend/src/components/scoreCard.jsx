@@ -1,38 +1,18 @@
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import '../css/overlay.css'
 
 function ScoreCard(props) {
   const navigate = useNavigate();
 
-  async function handlegetLeaderboard(name, score) {
-    try {
-      // Fetch full leaderboard
-      const response = await axios.get(
-        `http://localhost:3000/api/leaderboard?limit=50`
-      );
-      navigate("/leaderboard", {
-        state: { 
-          leaderboard: response.data.data || [],
-          name: name,
-          currentScore: score,
-          totalScore: props.totalScore || score,
-          maxScore: props.maxScore || score
-        },
-      });
-    } catch (error) {
-      console.log("Error in getting leaderboard", error);
-      // Navigate anyway with empty leaderboard
-      navigate("/leaderboard", {
-        state: { 
-          leaderboard: [],
-          name: name,
-          currentScore: score,
-          totalScore: props.totalScore || score,
-          maxScore: props.maxScore || score
-        },
-      });
-    }
+  function handlegetLeaderboard(name, score) {
+    navigate("/leaderboard", {
+      state: {
+        name: name,
+        currentScore: score,
+        totalScore: props.totalScore || score,
+        maxScore: props.maxScore || score,
+      },
+    });
   }
 
   const handleQuit = () => {

@@ -199,8 +199,9 @@
 .feedback-message {
   position: fixed;
   top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   background: rgba(255, 255, 255, 0.08);
   border: 1.5px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -212,19 +213,19 @@
   font-weight: 600;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   z-index: 999;
-  animation: slideDown 0.4s ease-out;
+  animation: slideDownCentered 0.35s ease-out;
   text-align: center;
-  max-width: 80%;
+  width: min(80%, 640px);
 }
 
-@keyframes slideDown {
+@keyframes slideDownCentered {
   from {
     opacity: 0;
-    transform: translate(-50%, -20px);
+    transform: translateY(-20px);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 }
 
@@ -253,6 +254,36 @@
   padding: 0 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   z-index: 100;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-help-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Anton', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.navbar-help-btn:hover {
+  transform: scale(1.08);
+  border-color: rgba(255, 18, 18, 0.7);
+  background: rgba(161, 0, 0, 0.45);
+  box-shadow: 0 4px 12px rgba(255, 18, 18, 0.25);
 }
 
 .navbar-title {
@@ -349,6 +380,16 @@
     height: 60px;
   }
 
+  .navbar-actions {
+    gap: 10px;
+  }
+
+  .navbar-help-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
   .feedback-message {
     font-size: 0.85rem;
     top: 70px;
@@ -418,6 +459,12 @@
 
   .movieguess-navbar {
     height: 55px;
+  }
+
+  .navbar-help-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 0.95rem;
   }
   .profile-image{
     height: 35px;

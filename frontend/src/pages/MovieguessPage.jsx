@@ -6,6 +6,7 @@ import Clue from "./Clue";
 import ScoreCard from "../components/ScoreCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import UserProfileCard from "../components/UserProfileCard";
+import Instructions from "./Instructions";
 import { profileCache } from "../utils/profileCache";
 import defaultPic from "../images/default-pic.png";
 
@@ -30,21 +31,62 @@ function MovieGuessPage() {
   const [maxScore, setMaxScore] = useState(0);
   const [totalGames, setTotalGames] = useState(0);
   const [navbarImage, setNavbarImage] = useState(defaultPic);
+  const [currentUserName, setCurrentUserName] = useState("");
+  const [profileEmail, setProfileEmail] = useState("");
+  const [isSubmittingScore, setIsSubmittingScore] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
-  const name = location.state?.name || "";
+  const routeName = location.state?.name || "";
+  const routeTotalScore = Number(location.state?.totalScore) || 0;
+  const routeMaxScore = Number(location.state?.maxScore) || 0;
+  const routeTotalGames = Number(location.state?.totalGames) || 0;
   const userProfile = location.state?.userProfile || null; // Google user profile data
 
-  // Load profile image for navbar from cache
-  useEffect(() => {
-    const cached = profileCache.get();
-    if (cached && cached.profileImage) {
-      setNavbarImage(cached.profileImage);
-    } else {
-      setNavbarImage(userProfile?.picture || defaultPic);
+  const resolveProfileImage = (profileData) => {
+    if (profileData?.profile_image && profileData?.image_type) {
+      return `data:${profileData.image_type};base64,${profileData.profile_image}`;
     }
-  }, [userProfile]);
+
+    const cached = profileCache.get();
+    if (cached?.profileImage) {
+      return cached.profileImage;
+    }
+
+    return userProfile?.picture || defaultPic;
+  };
+
+  const fetchAuthenticatedProfile = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/auth/profile", {
+        withCredentials: true,
+      });
+
+      const user = response.data?.user;
+      if (!user?.id) {
+        return;
+      }
+
+      const resolvedName = user.name || routeName || user.email || "Guest";
+      const resolvedImage = resolveProfileImage(user);
+
+      setUserId(user.id);
+      setCurrentUserName(resolvedName);
+      setProfileEmail(user.email || "");
+      setNavbarImage(resolvedImage);
+
+      profileCache.set({
+        profileImage: resolvedImage,
+        displayName: resolvedName,
+      });
+    } catch (profileError) {
+      const cached = profileCache.get();
+      setCurrentUserName(cached?.displayName || routeName || "Guest");
+      setNavbarImage(cached?.profileImage || userProfile?.picture || defaultPic);
+      setProfileEmail(userProfile?.email || "");
+    }
+  };
 
   async function handleAnswerCheck() {
     try {
@@ -78,10 +120,10 @@ function MovieGuessPage() {
           `Wrong Answer, Original Answer is ${response.data.originalAnswer}`
         );
         // Submit score to leaderboard and navigate
-        await submitScoreToLeaderboard(score);
+        const updatedStats = await submitScoreToLeaderboard(score);
         setTimeout(async () => {
           setFeedbackMessage("");
-          await handleViewLeaderboard();
+          await handleViewLeaderboard(updatedStats);
         }, 3000);
       }
     } catch (error) {
@@ -153,33 +195,62 @@ function MovieGuessPage() {
 
   // Submit score to leaderboard
   const submitScoreToLeaderboard = async (currentScore) => {
+    if (!userId || !currentUserName.trim()) {
+      setError("Unable to submit score. Please refresh and try again.");
+      return;
+    }
+
+    setIsSubmittingScore(true);
     try {
       const response = await axios.post(
         `http://localhost:3000/api/leaderboard`,
         {
-          user_id: userId || Date.now(), // Use timestamp as temp ID if no userId
-          username: name,
-          current_score: currentScore,
+          user_id: userId,
+          username: currentUserName.trim(),
+          current_score: Number(currentScore) || 0,
+        },
+        {
+          withCredentials: true,
         }
       );
       // Update local stats
       if (response.data) {
-        setTotalScore(response.data.total_score);
-        setMaxScore(response.data.max_score);
-        setTotalGames(response.data.total_games);
+        const nextTotalScore = Number(response.data.total_score) || 0;
+        const nextMaxScore = Number(response.data.max_score) || 0;
+        const nextTotalGames = Number(response.data.total_games) || 0;
+
+        setTotalScore(nextTotalScore);
+        setMaxScore(nextMaxScore);
+        setTotalGames(nextTotalGames);
+
+        return {
+          totalScore: nextTotalScore,
+          maxScore: nextMaxScore,
+          totalGames: nextTotalGames,
+        };
       }
     } catch (error) {
       console.error("Error submitting score to leaderboard:", error);
+      setError("Failed to update leaderboard. Please try again.");
+    } finally {
+      setIsSubmittingScore(false);
     }
+
+    return null;
   };
 
   useEffect(() => {
     fetchQuestion();
-    // Set userId from userProfile or generate one
-    if (userProfile?.sub) {
-      setUserId(userProfile.sub);
-    } else {
-      setUserId(Date.now());
+    fetchAuthenticatedProfile();
+
+    if (routeTotalScore > 0) {
+      setTotalScore(routeTotalScore);
+    }
+    if (routeMaxScore > 0) {
+      setMaxScore(routeMaxScore);
+    }
+    if (routeTotalGames > 0) {
+      setTotalGames(routeTotalGames);
     }
   }, []);
 
@@ -199,47 +270,36 @@ function MovieGuessPage() {
   }, [showClue]);
 
   const handleProfileClick = () => {
+    setShowInstructions(false);
     setShowProfileCard(!showProfileCard);
   };
 
-  const handleViewLeaderboard = async () => {
-    try {
-      // Fetch full leaderboard
-      const response = await axios.get(
-        `http://localhost:3000/api/leaderboard?limit=50`
-      );
-      navigate("/leaderboard", {
-        state: { 
-          name: name, 
-          leaderboard: response.data.data || [],
-          currentScore: score,
-          totalScore: totalScore,
-          maxScore: maxScore
-        },
-      });
-      // Reset score after navigating
-      setScore(0);
-    } catch (error) {
-      console.error("Error fetching leaderboard:", error);
-      // Navigate anyway with empty leaderboard
-      navigate("/leaderboard", {
-        state: { 
-          name: name, 
-          leaderboard: [],
-          currentScore: score,
-          totalScore: totalScore,
-          maxScore: maxScore
-        },
-      });
-      // Reset score after navigating
-      setScore(0);
-    }
+  const handleHelpClick = () => {
+    setShowProfileCard(false);
+    setShowInstructions(!showInstructions);
+  };
+
+  const handleViewLeaderboard = async (updatedStats = null) => {
+    const nextTotalScore = updatedStats?.totalScore ?? totalScore;
+    const nextMaxScore = updatedStats?.maxScore ?? maxScore;
+    const nextTotalGames = updatedStats?.totalGames ?? totalGames;
+
+    navigate("/leaderboard", {
+      state: {
+        name: currentUserName,
+        currentScore: score,
+        totalScore: nextTotalScore,
+        maxScore: nextMaxScore,
+        totalGames: nextTotalGames,
+      },
+    });
+    setScore(0);
   };
 
   const handleQuit = async () => {
     // Submit score to leaderboard and navigate
-    await submitScoreToLeaderboard(score);
-    await handleViewLeaderboard();
+    const updatedStats = await submitScoreToLeaderboard(score);
+    await handleViewLeaderboard(updatedStats);
   };
 
   const handleProfileUpdate = (updatedData) => {
@@ -250,7 +310,7 @@ function MovieGuessPage() {
       setNavbarImage(updatedData.picture);
     }
     if (updatedData.name) {
-      // Update name in local state if needed
+      setCurrentUserName(updatedData.name);
     }
   };
 
@@ -259,20 +319,39 @@ function MovieGuessPage() {
       {/* Navbar */}
       <nav className="movieguess-navbar">
         <div className="navbar-title">Movie Guesser</div>
-        <div className="navbar-profile" onClick={handleProfileClick}>
-          <img
-            src={navbarImage}
-            alt="Profile"
-            className="profile-image"
-          />
+        <div className="navbar-actions">
+          <button
+            type="button"
+            className="navbar-help-btn"
+            onClick={handleHelpClick}
+            aria-label="Open instructions"
+            title="Help"
+          >
+            ?
+          </button>
+          <div className="navbar-profile" onClick={handleProfileClick}>
+            <img
+              src={navbarImage}
+              alt="Profile"
+              className="profile-image"
+            />
+          </div>
         </div>
       </nav>
+
+      {showInstructions && (
+        <Instructions onClose={() => setShowInstructions(false)} />
+      )}
 
       {/* User Profile Card */}
       {showProfileCard && (
         <UserProfileCard
-          userProfile={userProfile}
-          name={name}
+          userProfile={{
+            ...(userProfile || {}),
+            email: profileEmail || userProfile?.email || "",
+            picture: navbarImage,
+          }}
+          name={currentUserName}
           currentScore={score}
           totalScore={totalScore}
           maxScore={maxScore}
@@ -292,7 +371,7 @@ function MovieGuessPage() {
         <Clue clueText={clueText} clueNo={clueNo} setShowClue={setShowClue} />
       )}
 
-      {showScore && <ScoreCard score={score} name={name} totalScore={totalScore} maxScore={maxScore} />}
+      {showScore && <ScoreCard score={score} name={currentUserName} totalScore={totalScore} maxScore={maxScore} />}
 
       <div
         className={`question-page-container ${
@@ -327,13 +406,14 @@ function MovieGuessPage() {
               <button
                 className="AnswerCheckButton"
                 onClick={handleAnswerCheck}
-                disabled={!(inputText.trim() && checkdisablebutton)}
+                disabled={!(inputText.trim() && checkdisablebutton) || isSubmittingScore}
               >
                 Check
               </button>
               <button
                 className="AnswerCheckButton quit-btn"
                 onClick={handleQuit}
+                disabled={isSubmittingScore}
               >
                 Quit
               </button>

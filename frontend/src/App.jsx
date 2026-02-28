@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Homepage from "./pages/Homepage";
 import MovieGuessPage from "./pages/MovieguessPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
-import Instructions from "./components/instructions";
+import Instructions from "./pages/Instructions";
 import ReadName from "./components/readName";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";

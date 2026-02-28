@@ -95,7 +95,20 @@ const LoginPage = () => {
       }
     } catch (err) {
       console.error("Login error:", err);
-      setErrors({ form: "Server error. Try again later." });
+      const status = err?.response?.status;
+      const message = err?.response?.data?.message;
+
+      if (status === 401) {
+        if (message === "User not found") {
+          setErrors({ form: "User not found. Please check your email." });
+        } else {
+          setErrors({ form: "Invalid email or password" });
+        }
+      } else if (status === 400) {
+        setErrors({ form: message || "Please enter valid credentials." });
+      } else {
+        setErrors({ form: "Server error. Try again later." });
+      }
     } finally {
       setLoading(false);
     }
