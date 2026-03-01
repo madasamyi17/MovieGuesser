@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import '../css/clueCard.css'
+import './css/clueCard.css'
 
 function Clue({clueNo, clueText, setShowClue}){
     return (

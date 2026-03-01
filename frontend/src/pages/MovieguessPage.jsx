@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import "../css/MovieguessPage.css";
+import "./css/MovieguessPage.css";
 import axios from "axios";
-import "../css/overlay.css";
+import "../components/css/overlay.css";
 import Clue from "./Clue";
 import ScoreCard from "../components/ScoreCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import UserProfileCard from "../components/UserProfileCard";
 import Instructions from "./Instructions";
-import { profileCache } from "../utils/profileCache";
 import defaultPic from "../images/default-pic.png";
 
 function MovieGuessPage() {
@@ -49,11 +48,6 @@ function MovieGuessPage() {
       return `data:${profileData.image_type};base64,${profileData.profile_image}`;
     }
 
-    const cached = profileCache.get();
-    if (cached?.profileImage) {
-      return cached.profileImage;
-    }
-
     return userProfile?.picture || defaultPic;
   };
 
@@ -75,15 +69,9 @@ function MovieGuessPage() {
       setCurrentUserName(resolvedName);
       setProfileEmail(user.email || "");
       setNavbarImage(resolvedImage);
-
-      profileCache.set({
-        profileImage: resolvedImage,
-        displayName: resolvedName,
-      });
     } catch (profileError) {
-      const cached = profileCache.get();
-      setCurrentUserName(cached?.displayName || routeName || "Guest");
-      setNavbarImage(cached?.profileImage || userProfile?.picture || defaultPic);
+      setCurrentUserName(routeName || "Guest");
+      setNavbarImage(userProfile?.picture || defaultPic);
       setProfileEmail(userProfile?.email || "");
     }
   };

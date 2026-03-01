@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import '../css/overlay.css'
+import './css/overlay.css'
 
 function ScoreCard(props) {
   const navigate = useNavigate();

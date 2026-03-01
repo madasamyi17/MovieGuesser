@@ -1,11 +1,11 @@
-/* Login Container */
-.login-container {
+/* Sign Up Container */
+.signup-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 20px;
+    padding: clamp(16px, 4vw, 24px);
     box-sizing: border-box;
     background-color: black;
     background-image: linear-gradient(rgba(0,0,0,0.8),rgba(0,0,0,0.7)),url("../images/martin-scorsese-1024x576.webp");
@@ -15,8 +15,8 @@
     background-position: center center;
 }
 
-/* Main Login Box - Glassmorphism Style */
-.login-box {
+/* Main Sign Up Box - Glassmorphism Style */
+.signup-box {
     background: rgba(255, 255, 255, 0.05);
     border: 1.5px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
@@ -26,10 +26,11 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     width: 100%;
     max-width: 420px;
+    box-sizing: border-box;
 }
 
-/* Login Title */
-.login-title {
+/* Sign Up Title */
+.signup-title {
     font-size: 2rem;
     color: rgba(255, 255, 255, 0.95);
     font-family: 'Anton', sans-serif;
@@ -39,7 +40,7 @@
 }
 
 /* Form Styling */
-.login-form {
+.signup-form {
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -52,7 +53,7 @@
     gap: 4px;
 }
 
-.login-form input {
+.signup-form input {
     padding: 12px 16px;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -65,32 +66,22 @@
     letter-spacing: 0.3px;
 }
 
-.login-form input:-webkit-autofill,
-.login-form input:-webkit-autofill:hover,
-.login-form input:-webkit-autofill:focus,
-.login-form input:-webkit-autofill:active {
-    -webkit-text-fill-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.08) inset;
-    -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.08) inset;
-    transition: background-color 9999s ease-in-out 0s;
-}
-
-.login-form input::placeholder {
+.signup-form input::placeholder {
     color: rgba(255, 255, 255, 0.4);
 }
 
-.login-form input:focus {
+.signup-form input:focus {
     border-color: rgba(255, 18, 18, 0.5);
     background-color: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 8px rgba(255, 18, 18, 0.15);
 }
 
-.login-form input.input-error {
+.signup-form input.input-error {
     border-color: rgba(255, 18, 18, 0.7);
     background-color: rgba(255, 18, 18, 0.08);
 }
 
-.login-form input.input-error:focus {
+.signup-form input.input-error:focus {
     box-shadow: 0 0 8px rgba(255, 18, 18, 0.3);
 }
 
@@ -101,10 +92,7 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 500;
     margin-top: 2px;
-}
-
-.form-error {
-    margin: 8px 0;
+    margin-left: 4px;
     text-align: left;
 }
 
@@ -143,28 +131,8 @@
     height: 18px;
 }
 
-/* Forgot Password */
-.forgot-password {
-    text-align:left;
-    margin: 12px 0 20px 0;
-}
-
-.forgot-password a {
-    color: rgba(255, 18, 18, 0.8);
-    text-decoration: none;
-    font-size: 0.85rem;
-    transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-}
-
-.forgot-password a:hover {
-    color: rgba(255, 255, 255, 0.9);
-    text-decoration: underline;
-}
-
 /* Button Styles */
-.login-button {
+.signup-button {
     padding: 12px 20px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
@@ -180,13 +148,13 @@
     margin-top: 10px;
 }
 
-.login-button:hover:not(:disabled) {
+.signup-button:hover:not(:disabled) {
     background-color: rgb(180, 20, 20);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 18, 18, 0.3);
 }
 
-.login-button:disabled {
+.signup-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
@@ -248,7 +216,7 @@
     font-weight: 500;
 }
 
-.signup-link {
+.login-link {
     color: rgba(255, 18, 18, 0.85);
     text-decoration: none;
     font-weight: 600;
@@ -257,28 +225,32 @@
     font-family: 'Poppins', sans-serif;
 }
 
-.signup-link:hover {
+.login-link:hover {
     color: rgba(255, 255, 255, 0.95);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .login-title {
+    .signup-container {
+        padding: 16px;
+    }
+
+    .signup-title {
         font-size: 1.6rem;
         letter-spacing: 1px;
     }
 
-    .login-box {
+    .signup-box {
         padding: 30px 25px;
         max-width: 100%;
     }
 
-    .login-form input {
+    .signup-form input {
         padding: 11px 14px;
         font-size: 0.9rem;
     }
 
-    .login-button {
+    .signup-button {
         padding: 11px 18px;
         font-size: 0.95rem;
     }
@@ -291,5 +263,15 @@
     .social-btn svg {
         width: 18px;
         height: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .signup-container {
+        padding: 14px;
+    }
+
+    .signup-box {
+        padding: 24px 16px;
     }
 }

@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
-import "../css/userProfileCard.css";
+import "./css/userProfileCard.css";
 import axios from "axios";
-import { profileCache } from "../utils/profileCache";
 import defaultPic from "../images/default-pic.png";
 
 function UserProfileCard({ 
@@ -23,54 +22,37 @@ function UserProfileCard({
   const [profileImage, setProfileImage] = useState(defaultPic);
   const [displayName, setDisplayName] = useState("");
 
-  // Load profile data from cache or backend on mount
+  // Load profile data from backend on mount
   useEffect(() => {
     const loadProfile = async () => {
-      // Try to get from cache first
-      const cached = profileCache.get();
-      
-      if (cached) {
-        setProfileImage(cached.profileImage || defaultPic);
-        setDisplayName(cached.displayName || name || userProfile?.email || "Guest");
-        setEditedName(cached.displayName || name || userProfile?.email || "Guest");
-      } else {
-        // Fetch from backend if not cached
-        try {
-          const response = await axios.get('http://localhost:3000/auth/profile', {
-            withCredentials: true
-          });
-          
-          const userData = response.data.user;
-          let imageUrl = defaultPic;
-          
-          if (userData.profile_image && userData.image_type) {
-            imageUrl = `data:${userData.image_type};base64,${userData.profile_image}`;
-          }
-          
-          const userName = userData.name || name || userProfile?.email || "Guest";
-          
-          setProfileImage(imageUrl);
-          setDisplayName(userName);
-          setEditedName(userName);
-          
-          // Cache the data
-          profileCache.set({
-            profileImage: imageUrl,
-            displayName: userName
-          });
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-          // Fallback to defaults
-          const userName = name || userProfile?.email || "Guest";
-          setDisplayName(userName);
-          setEditedName(userName);
-          setProfileImage(userProfile?.picture || defaultPic);
+      try {
+        const response = await axios.get('http://localhost:3000/auth/profile', {
+          withCredentials: true
+        });
+
+        const userData = response.data.user;
+        let imageUrl = defaultPic;
+
+        if (userData.profile_image && userData.image_type) {
+          imageUrl = `data:${userData.image_type};base64,${userData.profile_image}`;
         }
+
+        const userName = userData.name || name || userProfile?.email || "Guest";
+
+        setProfileImage(imageUrl);
+        setDisplayName(userName);
+        setEditedName(userName);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        const userName = name || userProfile?.email || "Guest";
+        setDisplayName(userName);
+        setEditedName(userName);
+        setProfileImage(userProfile?.picture || defaultPic);
       }
     };
 
     loadProfile();
-  }, [userProfile]);
+  }, [name, userProfile]);
 
   const handleProfilePictureClick = () => {
     fileInputRef.current?.click();
@@ -98,9 +80,6 @@ function UserProfileCard({
     setErrorMessage("");
 
     try {
-      // Clear cache before updating
-      profileCache.clear();
-      
       const formData = new FormData();
       formData.append('image', file);
 
@@ -120,13 +99,7 @@ function UserProfileCard({
         setProfileImage(imageUrl);
         setSuccessMessage("Profile updated!");
         setTimeout(() => setSuccessMessage(""), 3000);
-        
-        // Update cache with new image
-        profileCache.set({
-          profileImage: imageUrl,
-          displayName: displayName
-        });
-        
+
         // Notify parent component
         if (onProfileUpdate) {
           onProfileUpdate({ picture: imageUrl });
@@ -163,9 +136,6 @@ function UserProfileCard({
     setErrorMessage("");
 
     try {
-      // Clear cache before updating
-      profileCache.clear();
-      
       const response = await axios.put(
         'http://localhost:3000/auth/profile/username',
         { name: trimmedName },
@@ -176,13 +146,7 @@ function UserProfileCard({
       setTimeout(() => setSuccessMessage(""), 3000);
       setIsEditingName(false);
       setDisplayName(trimmedName);
-      
-      // Update cache with new name
-      profileCache.set({
-        profileImage: profileImage,
-        displayName: trimmedName
-      });
-      
+
       // Notify parent component
       if (onProfileUpdate) {
         onProfileUpdate({ name: trimmedName });

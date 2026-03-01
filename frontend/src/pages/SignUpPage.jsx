@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import "./SignUpPage.css";
+import "./css/SignUpPage.css";
 
 const SignUpPage = () => {
   const navigate = useNavigate();

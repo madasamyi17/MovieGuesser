@@ -1,4 +1,4 @@
-import "../css/readName.css";
+import "./css/readName.css";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useState } from "react";
 function ReadName() {

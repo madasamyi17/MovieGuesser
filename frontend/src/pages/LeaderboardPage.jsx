@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import "../css/leaderboard.css";
+import "./css/leaderboard.css";
 
 function LeaderboardPage() {
   const navigate = useNavigate();

@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
 import axios from "axios";
-import { profileCache } from "../utils/profileCache";
 
 // Create the Auth Context
 const AuthContext = createContext();
@@ -27,7 +26,6 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Logout error:", error);
     }
-    profileCache.clear();
     setUser(null);
   };
 

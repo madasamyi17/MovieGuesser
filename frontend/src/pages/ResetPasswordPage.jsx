@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import "./ResetPasswordPage.css";
+import "./css/ResetPasswordPage.css";
 
 const ResetPasswordPage = () => {
   const { token } = useParams();

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "../css/instructions.css";
+import "./css/instructions.css";
 
 function Instructions({ onClose }) {
   const navigate = useNavigate();
