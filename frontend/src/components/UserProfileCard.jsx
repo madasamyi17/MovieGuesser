@@ -26,7 +26,7 @@ function UserProfileCard({
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/auth/profile', {
+        const response = await axios.get('/auth/profile', {
           withCredentials: true
         });
 
@@ -84,7 +84,7 @@ function UserProfileCard({
       formData.append('image', file);
 
       const response = await axios.put(
-        'http://localhost:3000/auth/profile/image',
+        '/auth/profile/image',
         formData,
         {
           headers: {
@@ -137,7 +137,7 @@ function UserProfileCard({
 
     try {
       const response = await axios.put(
-        'http://localhost:3000/auth/profile/username',
+        '/auth/profile/username',
         { name: trimmedName },
         { withCredentials: true }
       );

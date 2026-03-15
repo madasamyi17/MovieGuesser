@@ -13,7 +13,7 @@ function Homepage() {
     const checkAuth = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/auth/me",
+          "/auth/me",
           {},
           { withCredentials: true }
         );
@@ -49,8 +49,6 @@ function Homepage() {
       </div>
     );
   }
-
-  console.log(import.meta.env.VITE_BACKEND_URL);
   return (
     <>
       <div className="movie-guess-container">

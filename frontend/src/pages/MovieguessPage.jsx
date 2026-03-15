@@ -53,7 +53,7 @@ function MovieGuessPage() {
 
   const fetchAuthenticatedProfile = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/auth/profile", {
+      const response = await axios.get("/auth/profile", {
         withCredentials: true,
       });
 
@@ -80,7 +80,7 @@ function MovieGuessPage() {
     try {
       setCheckdisablebutton(false);
       const response = await axios.post(
-        `http://localhost:3000/api/movieguess`,
+        `/api/movieguess`,
         {
           id: questionNo,
           userAnswer: inputText.trim(),
@@ -129,7 +129,7 @@ function MovieGuessPage() {
         return;
       }
       const response = await axios.post(
-        `http://localhost:3000/api/movieguess`,
+        `/api/movieguess`,
         {
           clueNo: clueNo,
           imdb_id: questionNo,
@@ -151,7 +151,7 @@ function MovieGuessPage() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:3000/api/movieguess`
+        `/api/movieguess`
       );
       setQuestion(response.data.description);
       setQuestionNo(response.data.imdb_id);
@@ -169,7 +169,7 @@ function MovieGuessPage() {
     if (!userId) return;
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/leaderboard/user/${userId}`
+        `/api/leaderboard/user/${userId}`
       );
       if (response.data) {
         setTotalScore(response.data.stats.total_score);
@@ -191,7 +191,7 @@ function MovieGuessPage() {
     setIsSubmittingScore(true);
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/leaderboard`,
+        `/api/leaderboard`,
         {
           user_id: userId,
           username: currentUserName.trim(),

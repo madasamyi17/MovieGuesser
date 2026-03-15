@@ -26,7 +26,7 @@ function LeaderboardPage() {
       setError("");
 
       try {
-        const response = await axios.get("http://localhost:3000/api/leaderboard?limit=50");
+        const response = await axios.get("/api/leaderboard?limit=50");
         if (isMounted) {
           setData(response.data?.data || []);
         }

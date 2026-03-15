@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children }) => {
     const checkAuth = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/auth/me",{},
+          "/auth/me",{},
           {
             withCredentials: true, // Send cookies with request
           }

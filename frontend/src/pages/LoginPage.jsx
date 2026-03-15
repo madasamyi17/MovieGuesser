@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./css/LoginPage.css";
+import { buildApiUrl } from "../utils/apiConfig";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -17,7 +18,7 @@ const LoginPage = () => {
     const checkAuth = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/auth/me",
+          "/auth/me",
           {},
           { withCredentials: true }
         );
@@ -75,7 +76,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const resp = await axios.post(
-        "http://localhost:3000/auth/login",
+        "/auth/login",
         { email, password },
         {
           withCredentials: true, // This ensures cookies are sent and received
@@ -117,7 +118,7 @@ const LoginPage = () => {
   const handleGoogleLogin = () => {
     console.log("Google login clicked - redirecting to backend");
     try {
-      window.location.href = "http://localhost:3000/auth/google";
+      window.location.href = buildApiUrl("/auth/google");
     } catch (error) {
       console.error("Error initiating Google login:", error);
       setErrors({ form: "Failed to initiate Google login" });

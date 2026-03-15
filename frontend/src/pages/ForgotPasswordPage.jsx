@@ -21,7 +21,7 @@ const ForgotPasswordPage = () => {
     setMessage("");
 
     try {
-      const response = await axios.post("http://localhost:3000/auth/forgot-password", {
+      const response = await axios.post("/auth/forgot-password", {
         email: email.trim()
       });
 

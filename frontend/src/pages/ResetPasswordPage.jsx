@@ -20,7 +20,7 @@ const ResetPasswordPage = () => {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        await axios.get(`http://localhost:3000/auth/reset-password/verify/${token}`);
+        await axios.get(`/auth/reset-password/verify/${token}`);
         setValidToken(true);
       } catch (verifyError) {
         setError(verifyError.response?.data?.message || "Reset link is invalid or expired.");
@@ -56,7 +56,7 @@ const ResetPasswordPage = () => {
     setError("");
 
     try {
-      const response = await axios.post(`http://localhost:3000/auth/reset-password/${token}`, {
+      const response = await axios.post(`/auth/reset-password/${token}`, {
         password
       });
 

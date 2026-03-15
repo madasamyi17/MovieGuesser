@@ -16,13 +16,20 @@ const {
     deleteAllUserTokens
 } = require('../services/passwordReset.service');
 
-
-const O_AUTH_CLIENT_ID = "265094258473-dk4rqre1u96car0d8effb4aoims7rhgc.apps.googleusercontent.com"
-const O_AUTH_CLIENT_SECRET = "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"
-const O_AUTH_REDIRECT_URL = "http://localhost:3000/auth/google/callback"
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const O_AUTH_CLIENT_ID = process.env.O_AUTH_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '';
+const O_AUTH_CLIENT_SECRET = process.env.O_AUTH_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || '';
+const O_AUTH_REDIRECT_URL =
+    process.env.O_AUTH_REDIRECT_URL ||
+    process.env.GOOGLE_REDIRECT_URI ||
+    `${process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 3000}`}/auth/google/callback`;
 
 exports.googleLogin = (req, res) => {
     try {
+        if (!O_AUTH_CLIENT_ID || !O_AUTH_REDIRECT_URL) {
+            return res.status(500).json({ message: 'Google OAuth is not configured' });
+        }
+
         // console.log(O_AUTH_CLIENT_ID)
         const params = new URLSearchParams({
             client_id: O_AUTH_CLIENT_ID,
@@ -47,6 +54,10 @@ exports.googleCallback = async (req, res) => {
     const code = req.query.code;
     let connection;
     try {
+        if (!O_AUTH_CLIENT_ID || !O_AUTH_CLIENT_SECRET || !O_AUTH_REDIRECT_URL) {
+            return res.redirect(`${FRONTEND_URL}/login?error=oauth_not_configured`);
+        }
+
         if (!code) {
             return res.status(400).json({ message: "Authorization code not provided" });
         }
@@ -109,7 +120,7 @@ exports.googleCallback = async (req, res) => {
 
         // Redirect directly to movieguess page
         // ProtectedRoute will check auth on page load
-        return res.redirect('http://localhost:5173/movieguess');
+        return res.redirect(`${FRONTEND_URL}/movieguess`);
     }
     catch (error) {
         console.error("Error during Google OAuth callback:", error);
@@ -121,7 +132,7 @@ exports.googleCallback = async (req, res) => {
                 console.error("Rollback error:", rollbackErr);
             }
         }
-        return res.redirect('http://localhost:5173/login?error=auth_failed');
+        return res.redirect(`${FRONTEND_URL}/login?error=auth_failed`);
     }
 };
 
@@ -251,8 +262,7 @@ exports.forgotPassword = async (req, res) => {
 
         await storeResetToken(user.id, token, expiresAt);
 
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-        const resetUrl = `${frontendUrl}/reset-password/${token}`;
+        const resetUrl = `${FRONTEND_URL}/reset-password/${token}`;
 
         await sendPasswordResetEmail({
             to: user.email,

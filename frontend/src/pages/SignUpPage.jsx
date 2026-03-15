@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./css/SignUpPage.css";
+import { buildApiUrl } from "../utils/apiConfig";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ const SignUpPage = () => {
         throw new Error("Email and password are required");
       }
       const resp = await axios.post(
-        "http://localhost:3000/auth/register",
+        "/auth/register",
         {
           email,
           password,
@@ -83,7 +84,7 @@ const SignUpPage = () => {
   const handleGoogleSignUp = () => {
     console.log("Google sign up clicked - redirecting to backend");
     try {
-      window.location.href = "http://localhost:3000/auth/google";
+      window.location.href = buildApiUrl("/auth/google");
     } catch (error) {
       console.error("Error initiating Google sign up:", error);
       setErrors({ form: "Failed to initiate Google sign up" });

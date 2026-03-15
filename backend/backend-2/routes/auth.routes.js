@@ -30,10 +30,12 @@ router.get('/auth/google/callback', authController.googleCallback);
 
 
 router.post('/auth/logout', (req, res) => {
+    const isProduction = process.env.NODE_ENV === 'production';
+
     res.clearCookie('token', {
         httpOnly: true,
-        sameSite: 'strict',
-        secure: false // Set to true if using HTTPS
+        sameSite: isProduction ? 'none' : 'lax',
+        secure: isProduction
     });
 
     return res.status(200).json({ message: "Logged out successfully" });
