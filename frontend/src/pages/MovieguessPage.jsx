@@ -3,11 +3,12 @@ import "./css/MovieguessPage.css";
 import axios from "axios";
 import "../components/css/overlay.css";
 import Clue from "./Clue";
-import ScoreCard from "../components/ScoreCard";
+// import Scorecard from "../components/Scorecard";
 import { useLocation, useNavigate } from "react-router-dom";
 import UserProfileCard from "../components/UserProfileCard";
 import Instructions from "./Instructions";
 import defaultPic from "../images/default-pic.png";
+import Scorecard from "../components/ScoreCard";
 
 
 function MovieGuessPage() {
@@ -360,7 +361,7 @@ function MovieGuessPage() {
         <Clue clueText={clueText} clueNo={clueNo} setShowClue={setShowClue} />
       )}
 
-      {showScore && <ScoreCard score={score} name={currentUserName} totalScore={totalScore} maxScore={maxScore} />}
+      {showScore && <Scorecard score={score} name={currentUserName} totalScore={totalScore} maxScore={maxScore} />}
 
       <div
         className={`question-page-container ${

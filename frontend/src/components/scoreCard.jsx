@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import './css/overlay.css'
 
-function ScoreCard(props) {
+function Scorecard(props) {
   const navigate = useNavigate();
 
   function handlegetLeaderboard(name, score) {
@@ -49,4 +49,4 @@ function ScoreCard(props) {
   );
 }
 
-export default ScoreCard;
+export default Scorecard;
