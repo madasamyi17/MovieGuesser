@@ -7,8 +7,8 @@
     min-height: 100vh;
     padding: clamp(16px, 4vw, 24px);
     box-sizing: border-box;
-    background-color: black;
-    background-image: linear-gradient(rgba(0,0,0,0.8),rgba(0,0,0,0.7)),url("../images/martin-scorsese-1024x576.webp");
+    /* background-color: black; */
+    /* background-image: linear-gradient(rgba(0,0,0,0.8),rgba(0,0,0,0.7)),url("../images/martin-scorsese-1024x576.webp"); */
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;

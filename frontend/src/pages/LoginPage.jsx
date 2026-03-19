@@ -192,9 +192,9 @@ const LoginPage = () => {
           </button>
         </form>
 
-        <div className="forgot-password">
+        {/* <div className="forgot-password">
           <a href="/forgot-password">Forgot Password?</a>
-        </div>
+        </div> */}
 
         <div className="divider-text">or you can sign in with</div>
 
