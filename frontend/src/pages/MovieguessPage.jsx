@@ -9,6 +9,7 @@ import UserProfileCard from "../components/UserProfileCard";
 import Instructions from "./Instructions";
 import defaultPic from "../images/default-pic.png";
 
+
 function MovieGuessPage() {
   const [question, setQuestion] = useState("");
   const [questionNo, setQuestionNo] = useState("");
