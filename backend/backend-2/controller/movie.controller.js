@@ -3,7 +3,7 @@ const { GoogleGenAI } = require("@google/genai");
 require('dotenv').config();
 
 const ai = new GoogleGenAI({
-  apiKey: 'AIzaSyB52L3ZI4n6hzI21oAh0goGvYruApQFkJE',
+  apiKey: 'AQ.Ab8RN6IHsMgRVRZkQvypdCptyBVZEBkQ2lgDiKJf1i71Jgv5MQ',
 });
 
 // Get next random question
