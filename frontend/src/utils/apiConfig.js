@@ -1,5 +1,6 @@
 // export const API_BASE_URL = "http://13.233.208.54:3000".replace(/\/+$/, "");
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+export const API_BASE_URL = "http://13.201.52.124:3000";
+// export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 
 export const buildApiUrl = (path = "") => {
