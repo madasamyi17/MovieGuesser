@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "movieguesser-fronetn",
+    "movieguesser": "movieguesserr"
+  },
+  "targets": {},
+  "etags": {}
+}
