@@ -8,24 +8,20 @@ const leaderboardRoutes = require('./routes/leaderboard.routes');
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:5173' || 'https://movieguesserr.web.app' )
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-
-// app.use(cors({
-//     origin: (origin, callback) => {
-//         if (!origin || allowedOrigins.includes(origin)) {
-//             callback(null, true);
-//             return;
-//         }
-//         callback(new Error('Not allowed by CORS'));
-//     },
-//     credentials: true
-// })); 
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://movieguesserr.web.app',
+    'https://movieguesserr.firebaseapp.com'
+];
 
 app.use(cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+            return;
+        }
+        callback(new Error('Not allowed by CORS'));
+    },
     credentials: true
 }));
 app.use(express.urlencoded({ extended: true }));

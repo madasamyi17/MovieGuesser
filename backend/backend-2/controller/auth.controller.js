@@ -16,13 +16,11 @@ const {
     deleteAllUserTokens
 } = require('../services/passwordReset.service');
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL = 'https://movieguesserr.web.app';
+const BACKEND_URL = 'http://13.201.52.124:3000';
 const O_AUTH_CLIENT_ID = process.env.O_AUTH_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '';
 const O_AUTH_CLIENT_SECRET = process.env.O_AUTH_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || '';
-const O_AUTH_REDIRECT_URL =
-    process.env.O_AUTH_REDIRECT_URL ||
-    process.env.GOOGLE_REDIRECT_URI ||
-    `${process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 3000}`}/auth/google/callback`;
+const O_AUTH_REDIRECT_URL = `${BACKEND_URL}/auth/google/callback`;
 
 exports.googleLogin = (req, res) => {
     try {

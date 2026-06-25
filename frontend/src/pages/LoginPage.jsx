@@ -84,8 +84,7 @@ const LoginPage = () => {
       );
       if (resp.status === 200) {
         console.log("Login successful:", resp.data);
-        // Backend sets httpOnly cookie, just mark as authenticated
-        login(null); // Cookie is automatically handled by withCredentials
+        login(null);
         navigate("/movieguess");
       }
       else if(resp.data && resp.data.message ==="User not found"){

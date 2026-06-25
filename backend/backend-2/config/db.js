@@ -14,6 +14,7 @@ const pool = mysql.createPool({
     port:  3306,
     user: 'root',
     password: 'Madasamy*17',
+    // password:'root',
     // password:'MySQL@2026Secure!',
     database: 'movie_db'
 });

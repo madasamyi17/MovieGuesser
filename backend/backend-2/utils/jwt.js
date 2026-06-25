@@ -6,7 +6,7 @@ exports.issueJWT = (user) => {
 
     return jwt.sign(
         {
-            user_id: user.id,
+            user_id: user.id ?? user.user_id,
             email: user.email
         },
         secret,

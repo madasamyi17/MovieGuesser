@@ -1,9 +1,9 @@
-exports.setAuthCookie = (res, token) => {
-    const isProduction = process.env.NODE_ENV === 'production';
+exports.getAuthCookieOptions = () => ({
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false
+});
 
-    res.cookie('token', token, {
-        httpOnly: true,
-        sameSite: isProduction ? 'none' : 'lax',
-        secure: isProduction
-    });
+exports.setAuthCookie = (res, token) => {
+    res.cookie('token', token, exports.getAuthCookieOptions());
 };

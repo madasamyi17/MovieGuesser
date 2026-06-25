@@ -4,6 +4,7 @@ const multer = require('multer');
 
 const authController = require('../controller/auth.controller');
 const { authMiddleware } = require('../middleware/auth.middleware');
+const { getAuthCookieOptions } = require('../utils/cookies');
 
 // Configure multer for memory storage
 const upload = multer({ 
@@ -30,14 +31,7 @@ router.get('/auth/google/callback', authController.googleCallback);
 
 
 router.post('/auth/logout', (req, res) => {
-    // const isProduction = process.env.NODE_ENV === 'production';
-
-    res.clearCookie('token', {
-        httpOnly: true,
-        // sameSite: isProduction ? 'none' : 'lax',
-        // secure: isProduction
-    });
-
+    res.clearCookie('token', getAuthCookieOptions());
     return res.status(200).json({ message: "Logged out successfully" });
 });
 
