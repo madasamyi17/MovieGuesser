@@ -5,7 +5,7 @@ exports.getLeaderboard = async (req, res) => {
   let conn;
   try {
     const { limit = 50, offset = 0 } = req.query;
-    console.log("Leader borad data"); 
+    console.log("Leader borad data");
     conn = await pool.getConnection();
     const [rows] = await conn.query(
       `SELECT user_id, username, total_score, max_score, total_games, updated_at 
@@ -14,11 +14,11 @@ exports.getLeaderboard = async (req, res) => {
        LIMIT ? OFFSET ?`,
       [parseInt(limit), parseInt(offset)]
     );
-    console.log("Leader borad data",rows);  
+    console.log("Leader borad data", rows);
     if (rows.length === 0) {
-      return res.status(200).json({ 
-        message: "No leaderboard entries found", 
-        data: [] 
+      return res.status(200).json({
+        message: "No leaderboard entries found",
+        data: []
       });
     }
 
@@ -42,7 +42,7 @@ exports.getUserRank = async (req, res) => {
     }
 
     conn = await pool.getConnection();
-    
+
     // Get user stats
     const [userStats] = await conn.query(
       `SELECT user_id, username, total_score, max_score, total_games, updated_at 
@@ -57,17 +57,21 @@ exports.getUserRank = async (req, res) => {
 
     // Get user rank
     const [rankResult] = await conn.query(
-      `SELECT COUNT(*) as rank 
-       FROM leader_board 
-       WHERE total_score > (SELECT total_score FROM leader_board WHERE user_id = ?)`,
+      `SELECT COUNT(*) AS user_rank
+   FROM leader_board 
+   WHERE total_score > (
+      SELECT total_score 
+      FROM leader_board 
+      WHERE user_id = ?
+   )`,
       [user_id]
     );
 
-    const rank = rankResult[0].rank + 1;
+    const rank = rankResult[0].user_rank + 1;
 
-    res.json({ 
-      rank, 
-      stats: userStats[0] 
+    res.json({
+      rank,
+      stats: userStats[0]
     });
   } catch (error) {
     console.error("❌ Error fetching user rank:", error);
@@ -85,13 +89,13 @@ exports.updateLeaderboardScore = async (req, res) => {
     const normalizedScore = Number(current_score);
 
     if (!user_id || !username || current_score === undefined || Number.isNaN(normalizedScore)) {
-      return res.status(400).json({ 
-        error: "Missing or invalid user_id, username, or current_score" 
+      return res.status(400).json({
+        error: "Missing or invalid user_id, username, or current_score"
       });
     }
 
     conn = await pool.getConnection();
-    
+
     // Start transaction
     await conn.beginTransaction();
 
@@ -132,7 +136,7 @@ exports.updateLeaderboardScore = async (req, res) => {
       // Commit transaction
       await conn.commit();
 
-      res.json({ 
+      res.json({
         message: existingUser.length > 0 ? "Leaderboard updated successfully" : "Leaderboard entry created successfully",
         total_score: newTotalScore,
         max_score: newMaxScore,
@@ -223,7 +227,7 @@ exports.resetUserScores = async (req, res) => {
       [user_id]
     );
 
-    res.json({ 
+    res.json({
       message: "User scores reset successfully",
       total_score: 0,
       max_score: 0,

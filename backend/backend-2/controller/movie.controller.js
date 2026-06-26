@@ -3,7 +3,7 @@ const { GoogleGenAI } = require("@google/genai");
 require('dotenv').config();
 
 const ai = new GoogleGenAI({
-  apiKey: 'AQ.Ab8RN6IHsMgRVRZkQvypdCptyBVZEBkQ2lgDiKJf1i71Jgv5MQ',
+  apiKey: 'AQ.Ab8RN6JS4MT7QxwW6L02DwN2sRD6U59m3EOhkN3QeJ8_oYAfLA',
 });
 
 // Get next random question
@@ -12,15 +12,15 @@ exports.getNextQuestion = async (req, res) => {
   try {
     conn = await pool.getConnection();
     const [rows] = await conn.query(
-      `SELECT id, imdb_id, movie_name, description FROM questions ORDER BY RAND() LIMIT 1`
+      `SELECT id, imdb_id, movie_name, description FROM movies ORDER BY RAND() LIMIT 1`
     );
 
     if (rows.length === 0) {
       return res.status(404).json({ error: "No questions found in DB" });
     }
-
+    console.log("Fetched question:", rows[0]);
     const { movie_name, imdb_id, description, id } = rows[0];
-    res.json({ movie_name, imdb_id, description, id });
+    return res.json({ movie_name, imdb_id, description, id });
   } catch (error) {
     console.error("❌ Error fetching question:", error);
     res.status(500).json({ error: "Failed to fetch question" });
@@ -70,7 +70,7 @@ exports.checkAnswer = async (req, res) => {
 
     conn = await pool.getConnection();
     const [rows] = await conn.query(
-      `SELECT movie_name FROM questions WHERE imdb_id = ?`,
+      `SELECT movie_name FROM movies WHERE imdb_id = ?`,
       [id]
     );
 
@@ -92,7 +92,7 @@ User Answer: ${userAnswer}
 `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash",
       contents: prompt,
     });
 
@@ -122,7 +122,7 @@ exports.getLeaderboard = async (req, res) => {
 
     // Insert user score into leaderboard
     await conn.query(
-      `INSERT INTO leaderboard (username, score) VALUES (?, ?)`,
+      `INSERT INTO leader_board (username, score) VALUES (?, ?)`,
       [username, score]
     );
 

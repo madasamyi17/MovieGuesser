@@ -14,6 +14,7 @@ router.post('/movieguess', (req, res, next) => {
     case 'clue':
       return movieController.getClue(req, res);
     case 'answerCheck':
+      console.log("Checking answers/...");
       return movieController.checkAnswer(req, res);
     case 'leaderboard':
       return movieController.getLeaderboard(req, res);

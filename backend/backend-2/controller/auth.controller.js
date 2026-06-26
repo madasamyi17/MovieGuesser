@@ -208,6 +208,7 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+
     const { email, password } = req.body;
     console.log("Login attempt with email:", email);
     if (!email || !password) {
